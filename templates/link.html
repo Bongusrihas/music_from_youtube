@@ -1,0 +1,252 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player</title>
+</head>
+<body>
+    <form action="/" method="POST">
+        <input placeholder="url" name="url_take">
+        <input type="submit">
+        {% for audio_file in audio_files %}
+            <div>
+                <p>{{ audio_file }}</p>
+                
+                <audio controls>
+                    <source src="{{ url_for('static', filename='audio/' ~ audio_file) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        {% endfor %}
+    </form>
+
+   
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Music Player</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .music-list {
+            margin-top: 20px;
+        }
+        .music-item {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .music-item:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .player-container {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background-color: #212529;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        }
+        .player-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 5px;
+            background: gray;
+            cursor: pointer;
+            margin-top: 10px;
+            position: relative;
+        }
+        .progress-bar {
+            height: 5px;
+            width: 0%;
+            background: #ffcc00;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .visualizer {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(90deg, #ff6f61, #ffcc00);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2 class="text-center text-primary">🎵 Custom Music Player 🎵</h2>
+
+    <form action="/" method="post" class="mb-3">
+        <input type="text" placeholder="Enter URL" name="url_take" class="form-control">
+    </form>
+
+    <div class="music-list">
+        {% for audio_file in audio_files %}
+        <div class="music-item border my-2 bg-light" onclick="playMusic('{{ url_for('static', filename='audio/' + audio_file) }}', '{{ audio_file }}')">
+            🎶 {{ audio_file }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Custom Audio Player -->
+<div class="player-container" id="player-container">
+    <p id="current-song" class="mb-0">Now Playing: </p>
+    
+    <div class="player-controls mt-2">
+        <button onclick="prevTrack()">⏮</button>
+        <button onclick="togglePlayPause()" id="playPauseBtn">▶</button>
+        <button onclick="nextTrack()">⏭</button>
+    </div>
+
+    <div class="progress-bar-container" onclick="seek(event)">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" oninput="changeVolume(this.value)">
+
+    <canvas id="visualizer" class="visualizer"></canvas>
+</div>
+
+<!-- Bootstrap JS & jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const audioPlayer = new Audio();
+    let currentTrackIndex = 0;
+    let tracks = [];
+    const playerContainer = document.getElementById("player-container");
+    const currentSong = document.getElementById("current-song");
+    const progressBar = document.getElementById("progress-bar");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const visualizer = document.getElementById("visualizer");
+
+    {% for audio_file in audio_files %}
+        tracks.push("{{ url_for('static', filename='audio/' + audio_file) }}");
+    {% endfor %}
+
+    function playMusic(src, name) {
+        currentTrackIndex = tracks.indexOf(src);
+        audioPlayer.src = src;
+        audioPlayer.play();
+        playerContainer.style.display = "block";
+        playPauseBtn.innerHTML = "⏸";
+        currentSong.textContent = "Now Playing: " + name;
+        visualizer.style.display = "block";
+        startVisualizer();
+    }
+
+    function togglePlayPause() {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseBtn.innerHTML = "⏸";
+        } else {
+            audioPlayer.pause();
+            playPauseBtn.innerHTML = "▶";
+        }
+    }
+
+    function nextTrack() {
+        if (currentTrackIndex < tracks.length - 1) {
+            currentTrackIndex++;
+        } else {
+            currentTrackIndex = 0;
+        }
+        playMusic(tracks[currentTrackIndex], tracks[currentTrackIndex].split('/').pop());
+    }
+
+    function prevTrack() {
+        if (currentTrackIndex > 0) {
+            currentTrackIndex--;
+        } else {
+            currentTrackIndex = tracks.length - 1;
+        }
+        playMusic(tracks[currentTrackIndex], tracks[currentTrackIndex].split('/').pop());
+    }
+
+    audioPlayer.addEventListener("timeupdate", function() {
+        let progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progressBar.style.width = progress + "%";
+    });
+
+    function seek(event) {
+        let percent = event.offsetX / event.target.offsetWidth;
+        audioPlayer.currentTime = percent * audioPlayer.duration;
+    }
+
+    function changeVolume(value) {
+        audioPlayer.volume = value;
+    }
+
+    function startVisualizer() {
+        const canvas = document.getElementById("visualizer");
+        const ctx = canvas.getContext("2d");
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioCtx.createAnalyser();
+        const source = audioCtx.createMediaElementSource(audioPlayer);
+
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        analyser.fftSize = 256;
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        canvas.width = window.innerWidth;
+        canvas.height = 50;
+
+        function draw() {
+            requestAnimationFrame(draw);
+            analyser.getByteFrequencyData(dataArray);
+            ctx.fillStyle = "#212529";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const barWidth = (canvas.width / bufferLength) * 2.5;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const barHeight = dataArray[i] / 2;
+                ctx.fillStyle = `rgb(${barHeight + 100}, 50, 150)`;
+                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                x += barWidth + 1;
+            }
+        }
+
+        draw();
+    }
+</script>
+
+</body>
+</html>
+
+
