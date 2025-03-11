@@ -108,6 +108,7 @@
 
     <form action="/" method="post" class="mb-3">
         <input type="text" placeholder="Enter URL" name="url_take" class="form-control">
+        <input type="submit">
     </form>
 
     <div class="music-list">
@@ -115,6 +116,7 @@
         <div class="music-item border my-2 bg-light" onclick="playMusic('{{ url_for('static', filename='audio/' + audio_file) }}', '{{ audio_file }}')">
             🎶 {{ audio_file }}
         </div>
+        <a href="/delete/{{audio_file}}"><button>Delete</button></a>
         {% endfor %}
     </div>
 </div>
