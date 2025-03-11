@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #dfdfdf;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+   <table>
+    <thead>
+        <tr>
+            <th>S.No</th>
+            <th>song</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in data2 %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ data["song"] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+   </table>
+   <a href="/"><button>music</button></a>
+</body>
+</html>
+
+
+
+

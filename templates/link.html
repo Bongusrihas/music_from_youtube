@@ -1,32 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Player</title>
-</head>
-<body>
-    <form action="/" method="POST">
-        <input placeholder="url" name="url_take">
-        <input type="submit">
-        {% for audio_file in audio_files %}
-            <div>
-                <p>{{ audio_file }}</p>
-                
-                <audio controls>
-                    <source src="{{ url_for('static', filename='audio/' ~ audio_file) }}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-        {% endfor %}
-    </form>
-
-   
-</body>
-</html> -->
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,12 +78,13 @@
     <h2 class="text-center text-primary">🎵 Custom Music Player 🎵</h2>
 
     <form action="/" method="post" class="mb-3">
+        <button><a href="/database">database</a></button>
         <input type="text" placeholder="Enter URL" name="url_take" class="form-control">
         <input type="submit">
     </form>
 
     <div class="music-list">
-        {% for audio_file in audio_files %}
+        {% for audio_file in music %}
         <div class="music-item border my-2 bg-light" onclick="playMusic('{{ url_for('static', filename='audio/' + audio_file) }}', '{{ audio_file }}')">
             🎶 {{ audio_file }}
         </div>
